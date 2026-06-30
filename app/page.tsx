@@ -11,7 +11,7 @@ export default function Board() {
   const [clickPos, setClickPos] = useState({ x: 0, y: 0 });
   const [description, setDescription] = useState("");
   const [selectedColor, setSelectedColor] = useState("#ffffff");
-
+  const [ submitting, setSubmitting ] = useState(false);
   const boardRef = useRef<HTMLDivElement>(null);
 
   const handleBgClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -23,8 +23,8 @@ export default function Board() {
   };
 
   const handleConfirm = async () => {
-    if (!description.trim()) return;
-
+    if (submitting) return;
+    setSubmitting(true);
     const newNote: Omit<Note, "id"> = {
       x: clickPos.x,
       y: clickPos.y,
@@ -48,6 +48,7 @@ export default function Board() {
     } catch {
       toast.error("Failed to save note");
     }
+    setSubmitting(false);
   };
 
   return (
@@ -109,9 +110,9 @@ export default function Board() {
               <button
                 className="px-4 py-1.5 text-sm rounded-md bg-blue-800 text-white hover:bg-blue-900 transition disabled:opacity-50"
                 onClick={handleConfirm}
-                disabled={!description.trim()}
+                disabled={submitting}
               >
-                Place
+                {submitting ? "Placing..." : "Place"}
               </button>
             </div>
           </div>
