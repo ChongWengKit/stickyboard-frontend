@@ -30,7 +30,7 @@ export default async function BoardLayout({
 
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="h-screen w-screen flex flex-col overflow-hidden">
+      <body>
         <NotesProvider initialBoard={initialBoard}>
           {children}
           <Toaster position="top-right" />

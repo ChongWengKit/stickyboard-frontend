@@ -53,7 +53,7 @@ export default function Board() {
   };
 
   return (
-    <div className="h-full overflow-auto">
+    <div className="overflow-auto">
       <div
         ref={boardRef}
         className="relative overflow-hidden"
