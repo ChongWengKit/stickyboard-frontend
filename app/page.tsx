@@ -14,6 +14,7 @@ export default function Board() {
   const [ submitting, setSubmitting ] = useState(false);
   const boardRef = useRef<HTMLDivElement>(null);
 
+
   const handleBgClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     setClickPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
@@ -108,7 +109,7 @@ export default function Board() {
               <button
                 className="px-4 py-1.5 text-sm rounded-md bg-blue-800 text-white hover:bg-blue-900 transition disabled:opacity-50"
                 onClick={handleConfirm}
-                disabled={submitting}
+                disabled={submitting || description.trim() === ""}
               >
                 {submitting ? "Placing..." : "Place"}
               </button>
