@@ -65,7 +65,7 @@ export default function Board() {
         {board.notes?.map((note: Note) => (
           <div
             key={note.id}
-            className="absolute p-3 rounded-lg shadow-lg"
+            className="sticky-note absolute p-3 rounded-lg shadow-lg"
             style={{
               left: note.x,
               top: note.y,

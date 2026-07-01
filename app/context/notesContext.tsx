@@ -7,7 +7,7 @@ export interface Board{
     notes:Note[];
     background:string;
 }
-export interface Note {
+export interface    Note {
     id: string;
     x: number;
     y: number;
