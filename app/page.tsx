@@ -6,7 +6,7 @@ import BoardBackground from "./BoardBackground";
 import toast from "react-hot-toast";
 
 export default function Board() {
-  const { board, isLoading } = useNotes();
+  const { board } = useNotes();
   const [showModal, setShowModal] = useState(false);
   const [clickPos, setClickPos] = useState({ x: 0, y: 0 });
   const [description, setDescription] = useState("");
@@ -28,7 +28,7 @@ export default function Board() {
     const newNote: Omit<Note, "id"> = {
       x: clickPos.x,
       y: clickPos.y,
-      description: description.trim(),
+      description: description,
       color: selectedColor,
     };
 
