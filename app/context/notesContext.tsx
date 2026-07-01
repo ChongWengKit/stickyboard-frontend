@@ -29,20 +29,15 @@ const NotesContext = createContext<NotesContextValue | undefined>(undefined);
 
 interface NotesProviderProps {
     children: ReactNode;
+    initialBoard?: Board;
 }
 
 export const NotesProvider = ({
     children,
+    initialBoard,
 }: NotesProviderProps) => {
-    const [board, setBoard] = useState<Board>({ notes: [], background: "" });
-    const [isLoading, setLoading] = useState(true);
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/board`)
-            .then((res) => res.json())
-            .then((data) => setBoard(data.data))
-            .finally(() => setLoading(false))
-            .catch(() => {});
-    }, []);
+    const [board, setBoard] = useState<Board>(initialBoard ?? { notes: [], background: "" });
+    const [isLoading, setLoading] = useState(!initialBoard);
 
     useEffect(() => {
         const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, { cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "ap1" });
