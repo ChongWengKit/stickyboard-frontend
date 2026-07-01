@@ -11,7 +11,7 @@ export default function Board() {
   const [clickPos, setClickPos] = useState({ x: 0, y: 0 });
   const [description, setDescription] = useState("");
   const [selectedColor, setSelectedColor] = useState("#ffffff");
-  const [ submitting, setSubmitting ] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const boardRef = useRef<HTMLDivElement>(null);
 
 
@@ -41,15 +41,15 @@ export default function Board() {
       });
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json.message || "Failed to save note");
-        return;
+        throw new Error(json.message || "Failed to save note");
       }
       toast.success(json.message)
       setShowModal(false);
-    } catch {
-      toast.error("Failed to save note");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to save note");
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   return (
