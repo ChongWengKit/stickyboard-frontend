@@ -53,8 +53,6 @@ export default function Board() {
 
   return (
     <div className="h-full overflow-auto">
-      {isLoading &&
-        <div className="flex justify-center items-center h-full text-2xl bg-neutral-700">Loading Notes...</div>}
       <div
         ref={boardRef}
         className="relative overflow-hidden"

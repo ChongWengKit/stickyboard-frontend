@@ -18,7 +18,6 @@ export interface    Note {
 
 export interface NotesContextValue {
     board: Board;
-    isLoading: boolean;
     addNote: (note: Note) => void;
     setBoard: (board: Board) => void;
 }
@@ -37,7 +36,6 @@ export const NotesProvider = ({
     initialBoard,
 }: NotesProviderProps) => {
     const [board, setBoard] = useState<Board>(initialBoard ?? { notes: [], background: "" });
-    const [isLoading, setLoading] = useState(!initialBoard);
 
     useEffect(() => {
         const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, { cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "ap1" });
@@ -58,7 +56,6 @@ export const NotesProvider = ({
     
     const value: NotesContextValue = {
         board,
-        isLoading,
         addNote,
         setBoard,
 
