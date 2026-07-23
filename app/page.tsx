@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useNotes, type Note } from "./context/notesContext";
 import BoardBackground from "./BoardBackground";
+import ChatBot from "./components/ChatBot";
 import toast from "react-hot-toast";
 
 export default function Board() {
@@ -12,6 +13,7 @@ export default function Board() {
   const [description, setDescription] = useState("");
   const [selectedColor, setSelectedColor] = useState("#ffffff");
   const [submitting, setSubmitting] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const boardRef = useRef<HTMLDivElement>(null);
 
 
@@ -75,6 +77,8 @@ export default function Board() {
           </div>
         ))}
       </div>
+
+      <ChatBot isOpen={isChatOpen} onToggle={() => setIsChatOpen(!isChatOpen)} />
 
       {showModal && (
         <div
