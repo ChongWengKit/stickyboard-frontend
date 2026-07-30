@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Note } from "../context/notesContext";
+import type { Note } from "../context/NotesContext";
 import toast from "react-hot-toast";
 
 interface AddNoteModalProps {

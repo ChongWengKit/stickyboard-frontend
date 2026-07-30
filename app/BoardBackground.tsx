@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useNotes } from "./context/notesContext";
+import { useNotes } from "./context/NotesContext";
 
 export default function BoardBackground() {
   const { board } = useNotes();

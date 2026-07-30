@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { NotesProvider, type Board } from "./context/notesContext";
+import { NotesProvider, type Board } from "./context/NotesContext";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {

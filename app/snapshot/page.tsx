@@ -1,6 +1,6 @@
 "use client";
 
-import { useNotes, type Note } from "../context/notesContext";
+import { useNotes, type Note } from "../context/NotesContext";
 
 export default function SnapshotPage() {
   const { board } = useNotes();

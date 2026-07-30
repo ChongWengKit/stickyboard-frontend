@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useNotes, type Note } from "./context/notesContext";
+import { useNotes, type Note } from "./context/NotesContext";
 import BoardBackground from "./BoardBackground";
 import ChatBot from "./components/ChatBot";
 import AddNoteModal from "./components/AddNoteModal";
