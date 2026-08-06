@@ -4,6 +4,9 @@ import { useState } from "react";
 import type { Note } from "../context/NotesContext";
 import toast from "react-hot-toast";
 
+const MAX_DESCRIPTION_LENGTH = 500;
+const HEX_COLOR_REGEX = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+
 interface AddNoteModalProps {
   show: boolean;
   clickPos: { x: number; y: number };
@@ -17,11 +20,26 @@ export default function AddNoteModal({ show, clickPos, onClose }: AddNoteModalPr
 
   const handleConfirm = async () => {
     if (submitting) return;
+
+    const trimmed = description.trim();
+    if (!trimmed) {
+      toast.error("Description cannot be empty");
+      return;
+    }
+    if (trimmed.length > MAX_DESCRIPTION_LENGTH) {
+      toast.error(`Description must be no longer than ${MAX_DESCRIPTION_LENGTH} characters`);
+      return;
+    }
+    if (!HEX_COLOR_REGEX.test(selectedColor)) {
+      toast.error("Color must be a valid hex color (e.g. #ffffff or #fff)");
+      return;
+    }
+
     setSubmitting(true);
     const newNote: Omit<Note, "id"> = {
       x: clickPos.x,
       y: clickPos.y,
-      description: description,
+      description: trimmed,
       color: selectedColor,
     };
 
@@ -51,9 +69,10 @@ export default function AddNoteModal({ show, clickPos, onClose }: AddNoteModalPr
       <div className="bg-white rounded-lg shadow-2xl p-5 w-80">
         <textarea
           className="w-full h-24 border text-gray-900 rounded-md p-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
-          placeholder="Write your note..."
+          placeholder={`Write your note... (max ${MAX_DESCRIPTION_LENGTH} chars)`}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          maxLength={MAX_DESCRIPTION_LENGTH}
           autoFocus
         />
         <div className="flex gap-2 mt-3">

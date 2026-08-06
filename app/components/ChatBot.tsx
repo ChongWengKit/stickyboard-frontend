@@ -15,6 +15,8 @@ interface ChatBotProps {
 }
 
 const STORAGE_KEY = "stickyboard-chat-messages";
+const MAX_MESSAGE_LENGTH = 500;
+const MAX_ASSISTANT_MESSAGE_LENGTH = 2000;
 
 function loadMessages(): ChatMessage[] {
   try {
@@ -43,6 +45,7 @@ export default function ChatBot({ isOpen, onToggle }: ChatBotProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isBotTyping, setIsBotTyping] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -67,6 +70,13 @@ export default function ChatBot({ isOpen, onToggle }: ChatBotProps) {
   const handleSend = async () => {
     const trimmed = input.trim();
     if (!trimmed || isBotTyping) return;
+    if (trimmed.length > MAX_MESSAGE_LENGTH) {
+      setValidationError(
+        `Message must be no longer than ${MAX_MESSAGE_LENGTH} characters (current: ${trimmed.length})`
+      );
+      return;
+    }
+    setValidationError(null);
 
     const userMsg: ChatMessage = {
       id: generateId(),
@@ -102,7 +112,7 @@ export default function ChatBot({ isOpen, onToggle }: ChatBotProps) {
       const assistantMsg: ChatMessage = {
         id: generateId(),
         role: "assistant",
-        content: botContent,
+        content: botContent.slice(0, MAX_ASSISTANT_MESSAGE_LENGTH),
         timestamp: Date.now(),
       };
       setMessages((prev) => [...prev, assistantMsg]);
@@ -267,14 +277,23 @@ export default function ChatBot({ isOpen, onToggle }: ChatBotProps) {
         </div>
 
         <div className="px-4 py-3 border-t" style={{ borderColor: "#525252" }}>
+          {validationError && (
+            <p className="text-xs mb-2" style={{ color: "#f87171" }}>
+              {validationError}
+            </p>
+          )}
           <div className="flex items-center gap-2">
             <input
               ref={inputRef}
               type="text"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              maxLength={MAX_MESSAGE_LENGTH}
+              onChange={(e) => {
+                setInput(e.target.value);
+                if (validationError) setValidationError(null);
+              }}
               onKeyDown={handleKeyDown}
-              placeholder="Type a message..."
+              placeholder={`Type a message... (max ${MAX_MESSAGE_LENGTH} chars)`}
               className="flex-1 rounded-full px-4 py-2 text-sm outline-none border"
               style={{
                 backgroundColor: "#262626",
