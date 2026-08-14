@@ -9,11 +9,6 @@ interface ChatMessage {
   timestamp: number;
 }
 
-interface ChatBotProps {
-  isOpen: boolean;
-  onToggle: () => void;
-}
-
 const STORAGE_KEY = "stickyboard-chat-messages";
 const MAX_MESSAGE_LENGTH = 500;
 const MAX_ASSISTANT_MESSAGE_LENGTH = 2000;
@@ -41,7 +36,8 @@ function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-export default function ChatBot({ isOpen, onToggle }: ChatBotProps) {
+export default function ChatBot() {
+  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isBotTyping, setIsBotTyping] = useState(false);
@@ -153,7 +149,7 @@ export default function ChatBot({ isOpen, onToggle }: ChatBotProps) {
   return (
     <>
       <button
-        onClick={onToggle}
+        onClick={() => setIsOpen(!isOpen)}
         className={`fixed bottom-6 z-50 flex items-center justify-center w-12 h-12 rounded-full shadow-xl border border-neutral-600 bg-neutral-700 text-neutral-300 transition-all duration-300 hover:scale-105 active:scale-95 ${isOpen ? "right-4 hidden md:flex md:right-[396px]" : "right-4"
           }`}
         style={{
@@ -202,7 +198,7 @@ export default function ChatBot({ isOpen, onToggle }: ChatBotProps) {
                 Clear All
               </button>
                <button
-                onClick={onToggle}
+                onClick={() => setIsOpen(!isOpen)}
                 className="md:hidden p-1 rounded transition hover:bg-neutral-600 cursor-pointer"
                 style={{ color: "#d4d4d4" }}
                 title="Close chat"

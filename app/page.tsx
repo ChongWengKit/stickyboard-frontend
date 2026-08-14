@@ -10,7 +10,6 @@ export default function Board() {
   const { board } = useNotes();
   const [showModal, setShowModal] = useState(false);
   const [clickPos, setClickPos] = useState({ x: 0, y: 0 });
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const boardRef = useRef<HTMLDivElement>(null);
 
   const handleBgClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -43,7 +42,7 @@ export default function Board() {
         ))}
       </div>
 
-      <ChatBot isOpen={isChatOpen} onToggle={() => setIsChatOpen(!isChatOpen)} />
+      <ChatBot />
 
       <AddNoteModal
         show={showModal}
