@@ -150,18 +150,16 @@ export default function ChatBot({ isOpen, onToggle }: ChatBotProps) {
     return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
-  const panelWidth = 380;
-
   return (
     <>
       <button
         onClick={onToggle}
-        className="fixed bottom-6 z-50 flex items-center justify-center w-12 h-12 rounded-full shadow-xl border border-neutral-600 bg-neutral-700 text-neutral-300 transition-all duration-300 hover:scale-105 active:scale-95"
+        className={`fixed bottom-6 z-50 flex items-center justify-center w-12 h-12 rounded-full shadow-xl border border-neutral-600 bg-neutral-700 text-neutral-300 transition-all duration-300 hover:scale-105 active:scale-95 ${isOpen ? "right-4 hidden md:flex md:right-[396px]" : "right-4"
+          }`}
         style={{
           backgroundColor: "#404040",
           borderColor: "#525252",
           color: "#d4d4d4",
-          right: isOpen ? panelWidth + 16 : 16,
         }}
         title={isOpen ? "Close chat" : "Open chat"}
       >
@@ -179,9 +177,8 @@ export default function ChatBot({ isOpen, onToggle }: ChatBotProps) {
 
       {/* Chat panel — dark theme, right side */}
       <div
-        className="fixed top-0 right-0 z-40 h-full border-l shadow-2xl flex flex-col transition-transform duration-300"
+        className="fixed top-0 right-0 z-40 h-full sm:w-full md:w-[380px] border-l shadow-2xl flex flex-col transition-transform duration-300"
         style={{
-          width: panelWidth,
           maxWidth: "100vw",
           backgroundColor: "#404040",
           color: "#d4d4d4",
@@ -194,15 +191,27 @@ export default function ChatBot({ isOpen, onToggle }: ChatBotProps) {
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold text-neutral-200">Stickyboard Bot</h2>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleClearAll}
-              className="px-2 py-1 text-xs rounded border transition hover:bg-neutral-600"
-              style={{ color: "#f87171", borderColor: "#f87171" }}
-              title="Clear all messages"
-            >
-              Clear All
-            </button>
+            <div className="flex items-center gap-2">
+
+              <button
+                onClick={handleClearAll}
+                className="px-2 py-1 text-xs rounded border transition hover:bg-neutral-600 cursor-pointer"
+                style={{ color: "#f87171", borderColor: "#f87171" }}
+                title="Clear all messages"
+              >
+                Clear All
+              </button>
+               <button
+                onClick={onToggle}
+                className="md:hidden p-1 rounded transition hover:bg-neutral-600 cursor-pointer"
+                style={{ color: "#d4d4d4" }}
+                title="Close chat"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
           </div>
         </div>
 
