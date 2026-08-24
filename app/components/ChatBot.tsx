@@ -12,6 +12,7 @@ interface ChatMessage {
 const STORAGE_KEY = "stickyboard-chat-messages";
 const MAX_MESSAGE_LENGTH = 500;
 const MAX_ASSISTANT_MESSAGE_LENGTH = 2000;
+const MAX_HISTORY_MESSAGES = 5;
 
 function loadMessages(): ChatMessage[] {
   try {
@@ -86,7 +87,7 @@ export default function ChatBot() {
     setIsBotTyping(true);
 
     try {
-      const history = messages.map((m) => ({
+      const history = messages.slice(-MAX_HISTORY_MESSAGES).map((m) => ({
         role: m.role,
         content: m.content,
       }));
