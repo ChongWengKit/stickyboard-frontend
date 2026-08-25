@@ -54,6 +54,8 @@ export default function AddNoteModal({ show, clickPos, onClose }: AddNoteModalPr
         throw new Error(json.message || "Failed to save note");
       }
       toast.success(json.message);
+      setDescription("");
+      setSelectedColor("#ffffff");
       onClose();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to save note");
