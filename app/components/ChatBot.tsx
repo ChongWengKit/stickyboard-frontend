@@ -176,7 +176,11 @@ export default function ChatBot() {
             <button
               onClick={handleClearAll}
               disabled={isDeleting}
-              className="px-2 py-1 text-xs rounded border transition hover:bg-neutral-600 cursor-pointer"
+              className={`px-2 py-1 text-xs rounded border transition ${
+                isDeleting
+                  ? "opacity-40 cursor-not-allowed"
+                  : "hover:bg-neutral-600 cursor-pointer"
+              }`}
               style={{ color: "#f87171", borderColor: "#f87171" }}
               title="Clear all messages"
             >
