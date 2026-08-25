@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-
+import { useState, useEffect, useRef, useCallback } from "react";
+import toast from "react-hot-toast";
 interface ChatMessage {
   id: string;
   role: "user" | "assistant";
@@ -9,29 +9,9 @@ interface ChatMessage {
   timestamp: number;
 }
 
-const STORAGE_KEY = "stickyboard-chat-messages";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const MAX_MESSAGE_LENGTH = 500;
 const MAX_ASSISTANT_MESSAGE_LENGTH = 2000;
-const MAX_HISTORY_MESSAGES = 5;
-
-function loadMessages(): ChatMessage[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed as ChatMessage[];
-    }
-  } catch {
-  }
-  return [];
-}
-
-function saveMessages(messages: ChatMessage[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-  } catch {
-  }
-}
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
@@ -42,17 +22,23 @@ export default function ChatBot() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isBotTyping, setIsBotTyping] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    setMessages(loadMessages());
+  const fetchMessages = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/chat/messages`);
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        setMessages(json.data);
+      }
+    } catch {
+    }
   }, []);
-
   useEffect(() => {
-    saveMessages(messages);
-  }, [messages]);
+    fetchMessages();
+  }, [fetchMessages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -87,19 +73,11 @@ export default function ChatBot() {
     setIsBotTyping(true);
 
     try {
-      const history = messages.slice(-MAX_HISTORY_MESSAGES).map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
-
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question: trimmed, history }),
-        }
-      );
+      const res = await fetch(`${API_URL}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: trimmed }),
+      });
       const json = await res.json();
 
       const botContent =
@@ -133,13 +111,18 @@ export default function ChatBot() {
     }
   };
 
-  const handleClearAll = () => {
-    setMessages([]);
-    localStorage.removeItem(STORAGE_KEY);
-  };
+  const handleClearAll = async () => {
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`${API_URL}/api/chat`, { method: "DELETE" });
+      if (res.ok) {
+        setMessages([]);
+      }
+    } catch {
+        toast.error("Failed to clear chat history.");
+    }
+    setIsDeleting(false);
 
-  const handleDeleteMessage = (id: string) => {
-    setMessages((prev) => prev.filter((m) => m.id !== id));
   };
 
   const formatTime = (ts: number) => {
@@ -188,27 +171,28 @@ export default function ChatBot() {
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold text-neutral-200">Stickyboard Bot</h2>
           </div>
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
 
-              <button
-                onClick={handleClearAll}
-                className="px-2 py-1 text-xs rounded border transition hover:bg-neutral-600 cursor-pointer"
-                style={{ color: "#f87171", borderColor: "#f87171" }}
-                title="Clear all messages"
-              >
-                Clear All
-              </button>
-               <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="md:hidden p-1 rounded transition hover:bg-neutral-600 cursor-pointer"
-                style={{ color: "#d4d4d4" }}
-                title="Close chat"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
+            <button
+              onClick={handleClearAll}
+              disabled={isDeleting}
+              className="px-2 py-1 text-xs rounded border transition hover:bg-neutral-600 cursor-pointer"
+              style={{ color: "#f87171", borderColor: "#f87171" }}
+              title="Clear all messages"
+            >
+              {isDeleting ? "Clearing..." : "Clear All"}
+            </button>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden p-1 rounded transition hover:bg-neutral-600 cursor-pointer"
+              style={{ color: "#d4d4d4" }}
+              title="Close chat"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -240,21 +224,10 @@ export default function ChatBot() {
                 }}
               >
                 <p className="whitespace-pre-wrap break-words">{msg.content}</p>
-                <div className="flex items-center justify-between mt-1" style={{ gap: 4 }}>
+                <div className="flex items-center mt-1">
                   <span className="text-xs" style={{ color: "#a3a3a3" }}>
                     {formatTime(msg.timestamp)}
                   </span>
-                  <button
-                    onClick={() => handleDeleteMessage(msg.id)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ color: "#f87171" }}
-                    title="Delete message"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 6 5 6 21 6" />
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                    </svg>
-                  </button>
                 </div>
               </div>
             </div>
